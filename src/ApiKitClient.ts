@@ -1,4 +1,4 @@
-import axios, { AxiosInstance, AxiosResponse } from 'axios';
+import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
 
 type UnauthorizationCallback = () => void;
 
@@ -17,7 +17,7 @@ export class ApiKitClient {
 
       this.unauthorizationCallback = unauthorizationCallback;
 
-      this.instance.interceptors.response.use(response => response, error => {
+      this.instance.interceptors.response.use((response: AxiosResponse) => response, (error: AxiosError) => {
         if (error.response?.status === 401 && this.unauthorizationCallback) {
           this.unauthorizationCallback();
         }
