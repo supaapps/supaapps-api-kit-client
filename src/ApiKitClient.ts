@@ -1,4 +1,5 @@
 import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
+import { PaginatedResponse } from './types';
 
 type UnauthorizationCallback = () => void;
 
@@ -26,8 +27,8 @@ export class ApiKitClient {
     }
   }
 
-  public static async get<T>(endpoint: string, params?: URLSearchParams): Promise<AxiosResponse<T[]>> {
-    return this.instance.get<T[]>(endpoint, { params });
+  public static async get<T>(endpoint: string, params?: URLSearchParams): Promise<AxiosResponse<PaginatedResponse<T[]>>> {
+    return this.instance.get<PaginatedResponse<T[]>>(endpoint, { params });
   }
     
   public static async getOne<T>(endpoint: string, params?: URLSearchParams): Promise<AxiosResponse<T>> {
