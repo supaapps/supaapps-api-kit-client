@@ -27,15 +27,30 @@ Before making any requests, initialize the `ApiKitClient` with your API's base U
 ```ts
 import { ApiKitClient } from 'supaapps-api-kit-client';
 
-const BASE_URL = 'https://api.example.com'
+interface User {
+  id: string;
+  name: string;
+}
 
-const AUTH_TOKEN = 'your_auth_token'
+interface Post {
+  id: string;
+  title: string;
+  content: string;
+}
 
-const unauthorizationCallback = () => {
-  // Implement redirection to login page here
-};
+// Define your unauthorized access handler
+function handleUnauthorizedAccess() {
+  // Implement the redirection or other logic here
+}
 
-ApiKitClient.initialize(BASE_URL, AUTH_TOKEN, unauthorizationCallback);
+// Factory function to create a typed API client for a specific model
+function createApiClientForModel<T>(baseUrl: string, authToken?: string) {
+  return ApiKitClient<T>(baseUrl, authToken, handleUnauthorizedAccess);
+}
+
+// Example usage
+const userApiClient = createApiClientForModel<User>('api_url', 'auth_token');
+const postApiClient = createApiClientForModel<Post>('api_url', 'auth_token');
 ```
 
 ## Making Requests
@@ -47,73 +62,36 @@ Use the `ApiKitClient` instance to make API requests. Here are some examples:
 Fetch a list of resources:
 
 ```ts
-interface User {
-  id: number;
-  name: string;
-  email: string;
-}
-
-ApiKitClient.get<User[]>('/users')
-  .then(response => console.log(response.data)) // Expected to be of type User[]
-  .catch(error => console.error(error));
+userApiClient.get('/users').then(response => {
+  if (response.status === 200) {
+    console.log('Fetched user:', response.data);
+  }
+});
 ```
 
 Fetch a single resource:
 
 ```ts
-ApiKitClient.getOne<User>('/users/1')
-  .then(response => console.log(response.data)) // Expected to be of type User
-  .catch(error => console.error(error));
+userApiClient.getOne('/users/1').then(response => {
+  if (response.status === 200) {
+    console.log('Fetched user:', response.data);
+  }
+});
 ```
 
 ### Creating Data
 
 ```ts
-// Create a new user
-const newUser: User = {
-  id: 1,
-  name: 'John Doe',
-  email: 'john@example.com',
+// Create a new post
+const newPost: Post = {
+  id: '123',
+  title: 'Hello World',
+  content: 'This is my first post',
 };
 
-ApiKitClient.post<User>('/users', newUser)
-  .then(response => console.log(response.data)) // Expected to be of type User
-  .catch(error => console.error(error));
-
+postApiClient.post('/posts', newPost).then(response => {
+  if (response.status === 200) {
+    console.log('Post created:', response.data);
+  }
+});
 ```
-
-### Updating Data
-
-```ts
-// Update a user's information
-const updatedUser: User = {
-  id: 1,
-  name: 'Jane Doe',
-  email: 'jane@example.com',
-};
-
-const updatedUser2: User = {
-  name: 'Jane Doe',
-};
-
-ApiKitClient.put<User>('/users/1', updatedUser)
-  .then(response => console.log(response.data)) // Expected to be of type User
-  .catch(error => console.error(error));
-
-ApiKitClient.patch<User>('/users/1', updatedUser2)
-  .then(response => console.log(response.data)) // Expected to be of type User
-  .catch(error => console.error(error));
-```
-
-### Deleting Data
-
-```ts
-// Delete a user
-ApiKitClient.delete('/users/1')
-  .then(() => console.log('User deleted'))
-  .catch(error => console.error(error));
-
-```
-
-## Handling Unauthorized Access
-The unauthorized access callback provided during initialization will be called automatically for any request that receives a 401 Unauthorized response, allowing you to handle such scenarios globally (e.g., redirecting the user to a login page).
