@@ -1,53 +1,56 @@
-import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
-import { PaginatedResponse } from './types';
+import axios, { AxiosError, AxiosRequestConfig } from 'axios';
+import { HttpMethod, ApiClientResponse, PaginatedResponse } from './types';
 
-type UnauthorizationCallback = () => void;
+export function ApiKitClient<T>(
+  baseUrl: string,
+  authToken?: string,
+  handleUnauthorizedAccess?: () => void
+) {
+  const axiosInstance = axios.create({
+    baseURL: baseUrl,
+    headers: {
+      ...(authToken ? { 'Authorization': `Bearer ${authToken}` } : {}),
+    },
+  });
 
-export class ApiKitClient {
-  private static instance: AxiosInstance;
-  private static unauthorizationCallback?: UnauthorizationCallback;
-
-  public static initialize(baseURL: string, authToken: string, unauthorizationCallback?: UnauthorizationCallback): void {
-    if (!this.instance) {
-      this.instance = axios.create({
-        baseURL,
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-        },
-      });
-
-      this.unauthorizationCallback = unauthorizationCallback;
-
-      this.instance.interceptors.response.use((response: AxiosResponse) => response, (error: AxiosError) => {
-        if (error.response?.status === 401 && this.unauthorizationCallback) {
-          this.unauthorizationCallback();
-        }
-        return Promise.reject(error);
-      });
+  axiosInstance.interceptors.response.use(response => response, (error: AxiosError) => {
+    if (error.response?.status === 401 && handleUnauthorizedAccess) {
+      handleUnauthorizedAccess();
     }
-  }
+    return Promise.reject(error);
+  });
 
-  public static async get<T>(endpoint: string, params?: URLSearchParams): Promise<AxiosResponse<PaginatedResponse<T[]>>> {
-    return this.instance.get<PaginatedResponse<T[]>>(endpoint, { params });
-  }
-    
-  public static async getOne<T>(endpoint: string, params?: URLSearchParams): Promise<AxiosResponse<T>> {
-    return this.instance.get<T>(endpoint, { params });
-  }
+  const request = async <R = T>(
+    method: HttpMethod,
+    endpoint: string,
+    body?: T,
+    params?: URLSearchParams
+  ): Promise<ApiClientResponse<R>> => {
+    const config: AxiosRequestConfig = {
+      url: endpoint,
+      method,
+      data: body,
+      params,
+    };
 
-  public static async post<T>(endpoint: string, data: T): Promise<AxiosResponse<T>> {
-    return this.instance.post<T>(endpoint, data);
-  }
+    try {
+      const response = await axiosInstance.request(config);
+      return { status: response.status, data: response.data };
+    } catch (error) {
+      const axiosError = error as AxiosError | any;
+      return {
+        status: axiosError.response?.status || 500,
+        errors: axiosError.response?.data.errors,
+      };
+    }
+  };
 
-  public static async put<T>(endpoint: string, data: T): Promise<AxiosResponse<T>> {
-    return this.instance.put<T>(endpoint, data);
-  }
-
-  public static async patch<T>(endpoint: string, data: T): Promise<AxiosResponse<T>> {
-    return this.instance.patch<T>(endpoint, data);
-  }
-
-  public static async delete<T>(endpoint: string): Promise<AxiosResponse<T>> {
-    return this.instance.delete<T>(endpoint);
-  }
+  return {
+    get: (endpoint: string, params?: URLSearchParams) => request<PaginatedResponse<T[]>>(HttpMethod.GET, endpoint, undefined, params),
+    getOne: (endpoint: string, params?: URLSearchParams) => request<T>(HttpMethod.GET, endpoint, undefined, params),
+    post: (endpoint: string, body: T) => request<T>(HttpMethod.POST, endpoint, body),
+    put: (endpoint: string, body: T) => request<T>(HttpMethod.PUT, endpoint, body),
+    patch: (endpoint: string, body: T) => request<T>(HttpMethod.PATCH, endpoint, body),
+    delete: (endpoint: string) => request<T>(HttpMethod.DELETE, endpoint),
+  };
 }
