@@ -2,20 +2,30 @@ import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
 import { PaginatedResponse } from './types';
 
 type UnauthorizationCallback = () => void;
+type AuthTokenCallback = () => Promise<string>;
 
 export class ApiKitClient {
-  private static instance: AxiosInstance | null = null;
+  private static instance: AxiosInstance;
   private static unauthorizationCallback?: UnauthorizationCallback;
+  private static authTokenCallback?: AuthTokenCallback;
 
-  public static initialize(baseURL: string, authToken: string, unauthorizationCallback?: UnauthorizationCallback): void {
-    this.instance = axios.create({
-      baseURL,
-      headers: {
-        Authorization: `Bearer ${authToken}`,
-      },
-    });
-
+  public static initialize(baseURL: string, authTokenCallback: AuthTokenCallback, unauthorizationCallback?: UnauthorizationCallback): void {
+    this.authTokenCallback = authTokenCallback;
     this.unauthorizationCallback = unauthorizationCallback;
+
+    this.instance = axios.create({ baseURL });
+
+    this.setupInterceptors();
+  }
+
+  private static setupInterceptors(): void {
+    this.instance.interceptors.request.use(async (config) => {
+      if (this.authTokenCallback) {
+        const authToken = await this.authTokenCallback();
+        config.headers.Authorization = `Bearer ${authToken}`;
+      }
+      return config;
+    });
 
     this.instance.interceptors.response.use((response: AxiosResponse) => response, (error: AxiosError) => {
       if (error.response?.status === 401 && this.unauthorizationCallback) {
