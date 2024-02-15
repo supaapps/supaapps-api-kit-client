@@ -66,6 +66,14 @@ ApiKitClient.getOne<User>('/users/1')
   .catch(error => console.error(error));
 ```
 
+Fetch a paginated resource:
+
+```ts
+ApiKitClient.getPaginated<User>('/users')
+  .then(response => console.log(response)) // Expected to be of type PaginatedResponse<User>
+  .catch(error => console.error(error));
+```
+
 ### Creating Data
 
 ```ts
@@ -79,7 +87,6 @@ const newUser: User = {
 ApiKitClient.post<User>('/users', newUser)
   .then(response => console.log(response.data)) // Expected to be of type User
   .catch(error => console.error(error));
-
 ```
 
 ### Updating Data
@@ -112,7 +119,6 @@ ApiKitClient.patch<User>('/users/1', updatedUser2)
 ApiKitClient.delete('/users/1')
   .then(() => console.log('User deleted'))
   .catch(error => console.error(error));
-
 ```
 
 ## Handling Unauthorized Access
