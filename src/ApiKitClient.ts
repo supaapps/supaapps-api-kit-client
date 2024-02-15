@@ -4,50 +4,60 @@ import { PaginatedResponse } from './types';
 type UnauthorizationCallback = () => void;
 
 export class ApiKitClient {
-  private static instance: AxiosInstance;
+  private static instance: AxiosInstance | null = null;
   private static unauthorizationCallback?: UnauthorizationCallback;
 
   public static initialize(baseURL: string, authToken: string, unauthorizationCallback?: UnauthorizationCallback): void {
+    this.instance = axios.create({
+      baseURL,
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
+
+    this.unauthorizationCallback = unauthorizationCallback;
+
+    this.instance.interceptors.response.use((response: AxiosResponse) => response, (error: AxiosError) => {
+      if (error.response?.status === 401 && this.unauthorizationCallback) {
+        this.unauthorizationCallback();
+      }
+      return Promise.reject(error);
+    });
+  }
+
+  private static checkInitialization(): void {
     if (!this.instance) {
-      this.instance = axios.create({
-        baseURL,
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-        },
-      });
-
-      this.unauthorizationCallback = unauthorizationCallback;
-
-      this.instance.interceptors.response.use((response: AxiosResponse) => response, (error: AxiosError) => {
-        if (error.response?.status === 401 && this.unauthorizationCallback) {
-          this.unauthorizationCallback();
-        }
-        return Promise.reject(error);
-      });
+      throw new Error("ApiKitClient has not been initialized. Please call ApiKitClient.initialize() before making requests.");
     }
   }
 
   public static async get<T>(endpoint: string, params?: URLSearchParams): Promise<AxiosResponse<PaginatedResponse<T[]>>> {
-    return this.instance.get<PaginatedResponse<T[]>>(endpoint, { params });
+    this.checkInitialization();
+    return this.instance!.get<PaginatedResponse<T[]>>(endpoint, { params });
   }
     
   public static async getOne<T>(endpoint: string, params?: URLSearchParams): Promise<AxiosResponse<T>> {
-    return this.instance.get<T>(endpoint, { params });
+    this.checkInitialization();
+    return this.instance!.get<T>(endpoint, { params });
   }
 
   public static async post<T>(endpoint: string, data: T): Promise<AxiosResponse<T>> {
-    return this.instance.post<T>(endpoint, data);
+    this.checkInitialization();
+    return this.instance!.post<T>(endpoint, data);
   }
 
   public static async put<T>(endpoint: string, data: T): Promise<AxiosResponse<T>> {
-    return this.instance.put<T>(endpoint, data);
+    this.checkInitialization();
+    return this.instance!.put<T>(endpoint, data);
   }
 
   public static async patch<T>(endpoint: string, data: T): Promise<AxiosResponse<T>> {
-    return this.instance.patch<T>(endpoint, data);
+    this.checkInitialization();
+    return this.instance!.patch<T>(endpoint, data);
   }
 
   public static async delete<T>(endpoint: string): Promise<AxiosResponse<T>> {
-    return this.instance.delete<T>(endpoint);
+    this.checkInitialization();
+    return this.instance!.delete<T>(endpoint);
   }
 }
