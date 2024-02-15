@@ -31,14 +31,19 @@ export class ApiKitClient {
     }
   }
 
-  public static async get<T>(endpoint: string, params?: URLSearchParams): Promise<AxiosResponse<PaginatedResponse<T[]>>> {
+  public static async get<T>(endpoint: string, params?: URLSearchParams): Promise<AxiosResponse<T>> {
     this.checkInitialization();
-    return this.instance!.get<PaginatedResponse<T[]>>(endpoint, { params });
+    return this.instance!.get<T>(endpoint, { params });
   }
     
   public static async getOne<T>(endpoint: string, params?: URLSearchParams): Promise<AxiosResponse<T>> {
     this.checkInitialization();
     return this.instance!.get<T>(endpoint, { params });
+  }
+
+  public static async getPaginated<T>(endpoint: string, params?: URLSearchParams): Promise<AxiosResponse<PaginatedResponse<T>>> {
+    this.checkInitialization();
+    return this.instance!.get<PaginatedResponse<T>>(endpoint, { params });
   }
 
   public static async post<T>(endpoint: string, data: T): Promise<AxiosResponse<T>> {
