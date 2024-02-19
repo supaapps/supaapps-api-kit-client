@@ -6,8 +6,8 @@ type AuthTokenCallback = () => Promise<string>;
 
 export class ApiKitClient {
   private static instance: AxiosInstance;
-  private static unauthorizationCallback?: UnauthorizationCallback;
-  private static authTokenCallback?: AuthTokenCallback;
+  private static authTokenCallback: AuthTokenCallback;
+  private static unauthorizationCallback: UnauthorizationCallback;
 
   public static initialize(baseURL: string, authTokenCallback: AuthTokenCallback, unauthorizationCallback?: UnauthorizationCallback): void {
     this.authTokenCallback = authTokenCallback;
