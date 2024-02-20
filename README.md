@@ -29,13 +29,15 @@ import { ApiKitClient } from 'supaapps-api-kit-client';
 
 const BASE_URL = 'https://api.example.com'
 
-const AUTH_TOKEN = 'your_auth_token'
+const authTokenCallback = () => {
+  // Implement authToken logic here
+};
 
 const unauthorizationCallback = () => {
   // Implement redirection to login page here
 };
 
-ApiKitClient.initialize(BASE_URL, AUTH_TOKEN, unauthorizationCallback);
+ApiKitClient.initialize(BASE_URL, authTokenCallback, unauthorizationCallback);
 ```
 
 ## Making Requests
