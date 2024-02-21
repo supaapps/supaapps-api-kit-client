@@ -2,11 +2,11 @@ name: Build
 
 on:
   push:
-    branches:
-        - main
-        - feature/SCKT-1_init_project_supaapps_api_kit_client
-        
+    branches: 
+      - '**'
   pull_request:
+    branches:
+      - '**'
 
 jobs:
   build:
