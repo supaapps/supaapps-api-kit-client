@@ -1,0 +1,21 @@
+{
+  "name": "supaapps-api-kit-client",
+  "version": "1.0.0",
+  "description": "A versatile, type-safe API kit client designed for TypeScript applications.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc"
+  },
+  "author": "Supaapps GmbH",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.6.7"
+  },
+  "devDependencies": {
+    "@types/axios": "^0.14.0",
+    "@types/node": "^20.11.17",
+    "typescript": "^5.3.3"
+  }
+}
