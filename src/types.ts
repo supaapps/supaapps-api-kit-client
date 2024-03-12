@@ -15,7 +15,7 @@ export interface PaginatedResponse<T> {
   next_page_url: string | null;
   path: string;
   per_page: number;
-  prev_page_url: string | null;
+  prev_page_url: number | null;
   to: number;
   total: number;
 }
