@@ -39,8 +39,7 @@ export class ApiKitClient {
       const { status } = error.response;
       if (status === 401 && this.unauthorizationCallback) {
         this.unauthorizationCallback();
-      }
-      if (this.globalErrorCallback) {
+      } else if (this.globalErrorCallback) {
         this.globalErrorCallback();
       }
       return Promise.reject(error);
