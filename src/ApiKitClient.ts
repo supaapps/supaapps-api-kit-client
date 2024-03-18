@@ -2,7 +2,7 @@ import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
 import { PaginatedResponse } from './types';
 
 type UnauthorizationCallback = () => void;
-type GlobalErrorCallback = () => void;
+type GlobalErrorCallback = (error: AxiosError) => void;
 type AuthTokenCallback = () => Promise<string>;
 
 export class ApiKitClient {
@@ -40,7 +40,7 @@ export class ApiKitClient {
       if (status === 401 && this.unauthorizationCallback) {
         this.unauthorizationCallback();
       } else if (this.globalErrorCallback) {
-        this.globalErrorCallback();
+        this.globalErrorCallback(error);
       }
       return Promise.reject(error);
     });
