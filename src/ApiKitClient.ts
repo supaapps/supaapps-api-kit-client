@@ -2,16 +2,24 @@ import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
 import { PaginatedResponse } from './types';
 
 type UnauthorizationCallback = () => void;
+type GlobalErrorCallback = (error: AxiosError) => void;
 type AuthTokenCallback = () => Promise<string>;
 
 export class ApiKitClient {
   private static instance: AxiosInstance;
   private static authTokenCallback: AuthTokenCallback;
   private static unauthorizationCallback: UnauthorizationCallback;
+  private static globalErrorCallback: GlobalErrorCallback;
 
-  public static initialize(baseURL: string, authTokenCallback: AuthTokenCallback, unauthorizationCallback?: UnauthorizationCallback): void {
+  public static initialize(
+    baseURL: string,
+    authTokenCallback: AuthTokenCallback,
+    unauthorizationCallback?: UnauthorizationCallback,
+    globalErrorCallback?: GlobalErrorCallback,
+  ): void {
     this.authTokenCallback = authTokenCallback;
     this.unauthorizationCallback = unauthorizationCallback;
+    this.globalErrorCallback = globalErrorCallback;
 
     this.instance = axios.create({ baseURL });
 
@@ -28,8 +36,11 @@ export class ApiKitClient {
     });
 
     this.instance.interceptors.response.use((response: AxiosResponse) => response, (error: AxiosError) => {
-      if (error.response?.status === 401 && this.unauthorizationCallback) {
+      const { status } = error.response;
+      if (status === 401 && this.unauthorizationCallback) {
         this.unauthorizationCallback();
+      } else if (this.globalErrorCallback) {
+        this.globalErrorCallback(error);
       }
       return Promise.reject(error);
     });

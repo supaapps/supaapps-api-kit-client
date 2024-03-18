@@ -34,10 +34,14 @@ const authTokenCallback = () => {
 };
 
 const unauthorizationCallback = () => {
-  // Implement redirection to login page here
+  // Implement unauthorization logic here
 };
 
-ApiKitClient.initialize(BASE_URL, authTokenCallback, unauthorizationCallback);
+const globalErrorCallback = () => {
+  // Implement global error logic here
+};
+
+ApiKitClient.initialize(BASE_URL, authTokenCallback, unauthorizationCallback, globalErrorCallback);
 ```
 
 ## Making Requests
@@ -124,4 +128,7 @@ ApiKitClient.delete('/users/1')
 ```
 
 ## Handling Unauthorized Access
-The unauthorized access callback provided during initialization will be called automatically for any request that receives a 401 Unauthorized response, allowing you to handle such scenarios globally (e.g., redirecting the user to a login page).
+The `unauthorizationCallback` provided during initialization will be called automatically for any request that receives a 401 Unauthorized response, allowing you to handle such scenarios globally (e.g., redirecting the user to a login page).
+
+## Handling Global Error
+The `globalErrorCallback` provided during initialization will be called if needed to handle custom errors, allowing you to handle such scenarios globally (e.g., throwing a custom error text).
