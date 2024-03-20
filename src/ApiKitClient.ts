@@ -71,7 +71,7 @@ export class ApiKitClient {
     return this.instance!.patch<T>(endpoint, data);
   }
 
-  public static async delete<T>(endpoint: string): Promise<AxiosResponse<T>> {
+  public static async delete<T>(endpoint: string): Promise<AxiosResponse> {
     this.checkInitialization();
     return this.instance!.delete<T>(endpoint);
   }
