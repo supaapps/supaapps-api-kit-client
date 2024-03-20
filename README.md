@@ -55,7 +55,7 @@ interface User {
   email: string;
 }
 
-ApiKitClient.getAll<User>('/users')
+ApiKitClient.get<User>('/users')
   .then(response => console.log(response.data)) // Expected to be of type User[]
   .catch(error => console.error(error));
 ```

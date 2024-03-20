@@ -41,7 +41,7 @@ export class ApiKitClient {
     }
   }
 
-  public static async getAll<T>(endpoint: string, params?: URLSearchParams): Promise<AxiosResponse<T[]>> {
+  public static async get<T>(endpoint: string, params?: URLSearchParams): Promise<AxiosResponse<T[]>> {
     this.checkInitialization();
     return this.instance!.get<T[]>(endpoint, { params });
   }
