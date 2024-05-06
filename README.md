@@ -37,7 +37,16 @@ const unauthorizationCallback = () => {
   // Implement redirection to login page here
 };
 
+const useAuth: boolean = // Optional: default is true, use false if you want to disable auth;
+
+// in case of using auth
 ApiKitClient.initialize(BASE_URL, authTokenCallback, unauthorizationCallback);
+
+// Or
+ApiKitClient.initialize(BASE_URL, authTokenCallback, unauthorizationCallback, true);
+
+// in case of not using auth
+ApiKitClient.initialize(BASE_URL, authTokenCallback, unauthorizationCallback, false);
 ```
 
 ## Making Requests

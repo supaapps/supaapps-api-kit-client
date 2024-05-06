@@ -8,10 +8,12 @@ export class ApiKitClient {
   private static instance: AxiosInstance;
   private static authTokenCallback: AuthTokenCallback;
   private static unauthorizationCallback: UnauthorizationCallback;
+  private static useAuth: boolean = true;
 
-  public static initialize(baseURL: string, authTokenCallback: AuthTokenCallback, unauthorizationCallback?: UnauthorizationCallback): void {
+  public static initialize(baseURL: string, authTokenCallback: AuthTokenCallback, unauthorizationCallback?: UnauthorizationCallback, useAuth?: boolean): void {
     this.authTokenCallback = authTokenCallback;
     this.unauthorizationCallback = unauthorizationCallback;
+    this.useAuth = useAuth;
 
     this.instance = axios.create({ baseURL });
 
@@ -20,7 +22,7 @@ export class ApiKitClient {
 
   private static setupInterceptors(): void {
     this.instance.interceptors.request.use(async (config) => {
-      if (this.authTokenCallback) {
+      if (this.useAuth && this.authTokenCallback) {
         const authToken = await this.authTokenCallback();
         config.headers.Authorization = `Bearer ${authToken}`;
       }
