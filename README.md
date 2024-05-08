@@ -72,7 +72,7 @@ ApiKitClient.getOne<User>('/users/1')
 Fetch a blob data:
 
 ```ts
-ApiKitClient.get<Blob>('/download', undefined, 'blob')
+ApiKitClient.get<Blob>('/download', { responseType: 'blob' })
   .then(response => console.log(response.data)) // Expected to be of type Blob
   .catch(error => console.error(error));
 ```
@@ -95,7 +95,7 @@ const newUser: User = {
   email: 'john@example.com',
 };
 
-ApiKitClient.post<User>('/users', newUser, 'json')
+ApiKitClient.post<User>('/users', newUser, { responseType: 'json' }) // by default is json, so you don't need to explicitly set it unless you need a different type (like 'blob', 'document', 'arraybuffer', or 'text').
   .then(response => console.log(response.data)) // Expected to be of type User
   .catch(error => console.error(error));
 ```
