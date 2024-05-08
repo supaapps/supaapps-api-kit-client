@@ -3,6 +3,10 @@ import { PaginatedResponse } from './types';
 
 type UnauthorizationCallback = () => void;
 type AuthTokenCallback = () => Promise<string>;
+type Options = {
+  responseType?: AxiosRequestConfig['responseType'],
+  params?: URLSearchParams
+}
 
 export class ApiKitClient {
   private static instance: AxiosInstance;
@@ -41,50 +45,50 @@ export class ApiKitClient {
     }
   }
 
-  private static createConfig(options?: { responseType?: AxiosRequestConfig['responseType'], params?: URLSearchParams }): AxiosRequestConfig {
+  private static createConfig(options?: Options): AxiosRequestConfig {
     return {
       responseType: options?.responseType,
       params: options?.params
     };
   }
 
-  public static async get<T>(endpoint: string, options?: { params?: URLSearchParams, responseType?: AxiosRequestConfig['responseType'] }): Promise<AxiosResponse<T>> {
+  public static async get<T>(endpoint: string, options?: Options): Promise<AxiosResponse<T>> {
     this.checkInitialization();
     const config = this.createConfig(options);
     return this.instance!.get<T>(endpoint, config);
   }
 
-  public static async getOne<T>(endpoint: string, options?: { params?: URLSearchParams, responseType?: AxiosRequestConfig['responseType'] }): Promise<AxiosResponse<T>> {
+  public static async getOne<T>(endpoint: string, options?: Options): Promise<AxiosResponse<T>> {
     this.checkInitialization();
     const config = this.createConfig(options);
     return this.instance!.get<T>(endpoint, config);
   }
 
-  public static async getPaginated<T>(endpoint: string, options?: { params?: URLSearchParams, responseType?: AxiosRequestConfig['responseType'] }): Promise<AxiosResponse<PaginatedResponse<T>>> {
+  public static async getPaginated<T>(endpoint: string, options?: Options): Promise<AxiosResponse<PaginatedResponse<T>>> {
     this.checkInitialization();
     const config = this.createConfig(options);
     return this.instance!.get<PaginatedResponse<T>>(endpoint, config);
   }
 
-  public static async post<T>(endpoint: string, data: T, options?: { responseType?: AxiosRequestConfig['responseType'] }): Promise<AxiosResponse<T>> {
+  public static async post<T>(endpoint: string, data: T, options?: Options): Promise<AxiosResponse<T>> {
     this.checkInitialization();
     const config = this.createConfig(options);
     return this.instance!.post<T>(endpoint, data, config);
   }
 
-  public static async put<T>(endpoint: string, data: T, options?: { responseType?: AxiosRequestConfig['responseType'] }): Promise<AxiosResponse<T>> {
+  public static async put<T>(endpoint: string, data: T, options?: Options): Promise<AxiosResponse<T>> {
     this.checkInitialization();
     const config = this.createConfig(options);
     return this.instance!.put<T>(endpoint, data, config);
   }
 
-  public static async patch<T>(endpoint: string, data: T, options?: { responseType?: AxiosRequestConfig['responseType'] }): Promise<AxiosResponse<T>> {
+  public static async patch<T>(endpoint: string, data: T, options?: Options): Promise<AxiosResponse<T>> {
     this.checkInitialization();
     const config = this.createConfig(options);
     return this.instance!.patch<T>(endpoint, data, config);
   }
 
-  public static async delete<T>(endpoint: string, options?: { responseType?: AxiosRequestConfig['responseType'] }): Promise<AxiosResponse<T>> {
+  public static async delete<T>(endpoint: string, options?: Options): Promise<AxiosResponse<T>> {
     this.checkInitialization();
     const config = this.createConfig(options);
     return this.instance!.delete<T>(endpoint, config);
