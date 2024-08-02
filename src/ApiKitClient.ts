@@ -56,7 +56,7 @@ export class ApiKitClient {
     return this.instance!.get<PaginatedResponse<T>>(endpoint, { params });
   }
 
-  public static async post<T>(endpoint: string, data: T): Promise<AxiosResponse<T>> {
+  public static async post<T>(endpoint: string, data?: T): Promise<AxiosResponse<T>> {
     this.checkInitialization();
     return this.instance!.post<T>(endpoint, data);
   }
