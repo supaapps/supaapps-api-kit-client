@@ -45,7 +45,7 @@ export class ApiKitClient {
     this.checkInitialization();
     return this.instance!.get<T>(endpoint, { params });
   }
-    
+
   public static async getOne<T>(endpoint: string, params?: URLSearchParams): Promise<AxiosResponse<T>> {
     this.checkInitialization();
     return this.instance!.get<T>(endpoint, { params });
@@ -61,12 +61,12 @@ export class ApiKitClient {
     return this.instance!.post<T>(endpoint, data);
   }
 
-  public static async put<T>(endpoint: string, data: T): Promise<AxiosResponse<T>> {
+  public static async put<T>(endpoint: string, data: Partial<T>): Promise<AxiosResponse<T>> {
     this.checkInitialization();
     return this.instance!.put<T>(endpoint, data);
   }
 
-  public static async patch<T>(endpoint: string, data: T): Promise<AxiosResponse<T>> {
+  public static async patch<T>(endpoint: string, data: Partial<T>): Promise<AxiosResponse<T>> {
     this.checkInitialization();
     return this.instance!.patch<T>(endpoint, data);
   }
