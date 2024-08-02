@@ -8,6 +8,7 @@ A versatile, type-safe API client designed for TypeScript applications. It simpl
 - **Authorization Support**: Automatically includes authorization tokens in requests.
 - **Customizable Unauthorized Access Handling**: Executes a callback function when encountering a 401 Unauthorized response, allowing for custom reaction strategies such as redirecting to a login page.
 - **Simplified API Requests**: Offers methods for common HTTP requests (`GET`, `POST`, `PUT`, `PATCH`, `DELETE`) with a straightforward, promise-based API.
+- **Flexible Response Handling**: Allows specifying the `responseType` for requests, enabling direct handling of blobs, JSON, and other formats.
 
 ## Installation
 
@@ -46,7 +47,7 @@ Use the `ApiKitClient` instance to make API requests. Here are some examples:
 
 ### Fetching Data
 
-Fetch a list of resources:
+Fetch a list of resources specifying the expected response type:
 
 ```ts
 interface User {
@@ -68,6 +69,14 @@ ApiKitClient.getOne<User>('/users/1')
   .catch(error => console.error(error));
 ```
 
+Fetch a blob data:
+
+```ts
+ApiKitClient.get<Blob>('/download', { responseType: 'blob' })
+  .then(response => console.log(response.data)) // Expected to be of type Blob
+  .catch(error => console.error(error));
+```
+
 Fetch a paginated resource:
 
 ```ts
@@ -86,7 +95,7 @@ const newUser: User = {
   email: 'john@example.com',
 };
 
-ApiKitClient.post<User>('/users', newUser)
+ApiKitClient.post<User>('/users', newUser, { responseType: 'json' }) // by default is json, so you don't need to explicitly set it unless you need a different type (like 'blob', 'document', 'arraybuffer', or 'text').
   .then(response => console.log(response.data)) // Expected to be of type User
   .catch(error => console.error(error));
 ```
