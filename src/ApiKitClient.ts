@@ -47,9 +47,9 @@ export class ApiKitClient {
     }
   }
 
-  public static async get<T>(endpoint: string, params?: URLSearchParams): Promise<AxiosResponse<T>> {
+  public static async get<T>(endpoint: string, params?: URLSearchParams): Promise<AxiosResponse<T[]>> {
     this.checkInitialization();
-    return this.instance!.get<T>(endpoint, { params });
+    return this.instance!.get<T[]>(endpoint, { params });
   }
 
   public static async getOne<T>(endpoint: string, params?: URLSearchParams): Promise<AxiosResponse<T>> {
@@ -77,7 +77,7 @@ export class ApiKitClient {
     return this.instance!.patch<T>(endpoint, data);
   }
 
-  public static async delete<T>(endpoint: string): Promise<AxiosResponse<T>> {
+  public static async delete<T>(endpoint: string): Promise<AxiosResponse> {
     this.checkInitialization();
     return this.instance!.delete<T>(endpoint);
   }
