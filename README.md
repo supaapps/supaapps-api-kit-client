@@ -126,7 +126,7 @@ interface User {
   email: string;
 }
 
-ApiKitClient.getInstanceByKey"default")
+ApiKitClient.getInstanceByKey("default")
   .get<User[]>("/users")
   .then((response) => console.log(response.data)) // Expected to be of type User[]
   .catch((error) => console.error(error));
@@ -135,7 +135,7 @@ ApiKitClient.getInstanceByKey"default")
 Fetch a single resource:
 
 ```ts
-ApiKitClient.getInstanceByKey"default")
+ApiKitClient.getInstanceByKey("default")
   .getOne<User>("/users/1")
   .then((response) => console.log(response.data)) // Expected to be of type User
   .catch((error) => console.error(error));
@@ -144,7 +144,7 @@ ApiKitClient.getInstanceByKey"default")
 Fetch a paginated resource:
 
 ```ts
-ApiKitClient.getInstanceByKey"default")
+ApiKitClient.getInstanceByKey("default")
   .getPaginated<User>("/users")
   .then((response) => console.log(response)) // Expected to be of type PaginatedResponse<User>
   .catch((error) => console.error(error));
@@ -160,7 +160,7 @@ const newUser: User = {
   email: "john@example.com",
 };
 
-ApiKitClient.getInstanceByKey"default")
+ApiKitClient.getInstanceByKey("default")
   .post<User>("/users", newUser)
   .then((response) => console.log(response.data)) // Expected to be of type User
   .catch((error) => console.error(error));
@@ -180,12 +180,12 @@ const updatedUser2: Partial<User> = {
   name: "Jane Doe",
 };
 
-ApiKitClient.getInstanceByKey"default")
+ApiKitClient.getInstanceByKey("default")
   .put<User>("/users/1", updatedUser)
   .then((response) => console.log(response.data)) // Expected to be of type User
   .catch((error) => console.error(error));
 
-ApiKitClient.getInstanceByKey"default")
+ApiKitClient.getInstanceByKey("default")
   .patch<User>("/users/1", updatedUser2)
   .then((response) => console.log(response.data)) // Expected to be of type User
   .catch((error) => console.error(error));
@@ -195,7 +195,7 @@ ApiKitClient.getInstanceByKey"default")
 
 ```ts
 // Delete a user
-ApiKitClient.getInstanceByKey"default")
+ApiKitClient.getInstanceByKey("default")
   .delete<User>("/users/1")
   .then(() => console.log("User deleted"))
   .catch((error) => console.error(error));
