@@ -1,16 +1,22 @@
-import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
-import { PaginatedResponse } from './types';
+import axios, { AxiosInstance, AxiosResponse, AxiosError } from "axios";
+import { PaginatedResponse } from "./types";
 
 type UnauthorizationCallback = () => void;
 type AuthTokenCallback = () => Promise<string>;
 
 export class ApiKitClient {
-  private static instance: AxiosInstance;
-  private static authTokenCallback?: AuthTokenCallback;
-  private static unauthorizationCallback?: UnauthorizationCallback;
-  private static useAuth: boolean = false;
+  private static instances: Map<string, ApiKitClient> = new Map();
+  private instance: AxiosInstance;
+  private authTokenCallback?: AuthTokenCallback;
+  private unauthorizationCallback?: UnauthorizationCallback;
+  private useAuth: boolean = false;
 
-  public static initialize(baseURL: string, authTokenCallback?: AuthTokenCallback, unauthorizationCallback?: UnauthorizationCallback, useAuth: boolean = false): void {
+  private constructor(
+    baseURL: string,
+    authTokenCallback?: AuthTokenCallback,
+    unauthorizationCallback?: UnauthorizationCallback,
+    useAuth: boolean = false
+  ) {
     if (useAuth && !authTokenCallback) {
       throw new Error("authTokenCallback must be provided if useAuth is true.");
     }
@@ -24,61 +30,109 @@ export class ApiKitClient {
     this.setupInterceptors();
   }
 
-  private static setupInterceptors(): void {
+  public static initialize(
+    instanceKey: string,
+    baseURL: string,
+    authTokenCallback?: AuthTokenCallback,
+    unauthorizationCallback?: UnauthorizationCallback,
+    useAuth: boolean = false
+  ): void {
+    const client = new ApiKitClient(
+      baseURL,
+      authTokenCallback,
+      unauthorizationCallback,
+      useAuth
+    );
+    this.instances.set(instanceKey, client);
+  }
+
+  public static getInstanceByKey(instanceKey: string): ApiKitClient {
+    const client = this.instances.get(instanceKey);
+    if (!client) {
+      throw new Error(
+        `ApiKitClient instance with key "${instanceKey}" has not been initialized.`
+      );
+    }
+    return client;
+  }
+
+  private setupInterceptors(): void {
     this.instance.interceptors.request.use(async (config) => {
       if (this.useAuth && this.authTokenCallback) {
         const authToken = await this.authTokenCallback();
-        config.headers.Authorization = `Bearer ${authToken}`;
+        if (authToken) {
+          config.headers.Authorization = `Bearer ${authToken}`;
+        }
       }
       return config;
     });
 
-    this.instance.interceptors.response.use((response: AxiosResponse) => response, (error: AxiosError) => {
-      if (error.response?.status === 401 && this.unauthorizationCallback) {
-        this.unauthorizationCallback();
+    this.instance.interceptors.response.use(
+      (response: AxiosResponse) => response,
+      (error: AxiosError) => {
+        if (error.response?.status === 401 && this.unauthorizationCallback) {
+          this.unauthorizationCallback();
+        }
+        return Promise.reject(error);
       }
-      return Promise.reject(error);
-    });
+    );
   }
 
-  private static checkInitialization(): void {
+  private checkInitialization(): void {
     if (!this.instance) {
-      throw new Error("ApiKitClient has not been initialized. Please call ApiKitClient.initialize() before making requests.");
+      throw new Error(
+        "ApiKitClient has not been initialized. Please call ApiKitClient.initialize() before making requests."
+      );
     }
   }
 
-  public static async get<T>(endpoint: string, params?: URLSearchParams): Promise<AxiosResponse<T>> {
+  public async get<T>(
+    endpoint: string,
+    params?: URLSearchParams
+  ): Promise<AxiosResponse<T>> {
     this.checkInitialization();
-    return this.instance!.get<T>(endpoint, { params });
+    return this.instance.get<T>(endpoint, { params });
   }
 
-  public static async getOne<T>(endpoint: string, params?: URLSearchParams): Promise<AxiosResponse<T>> {
+  public async getOne<T>(
+    endpoint: string,
+    params?: URLSearchParams
+  ): Promise<AxiosResponse<T>> {
     this.checkInitialization();
-    return this.instance!.get<T>(endpoint, { params });
+    return this.instance.get<T>(endpoint, { params });
   }
 
-  public static async getPaginated<T>(endpoint: string, params?: URLSearchParams): Promise<AxiosResponse<PaginatedResponse<T>>> {
+  public async getPaginated<T>(
+    endpoint: string,
+    params?: URLSearchParams
+  ): Promise<AxiosResponse<PaginatedResponse<T>>> {
     this.checkInitialization();
-    return this.instance!.get<PaginatedResponse<T>>(endpoint, { params });
+    return this.instance.get<PaginatedResponse<T>>(endpoint, { params });
   }
 
-  public static async post<T>(endpoint: string, data?: T): Promise<AxiosResponse<T>> {
+  public async post<T>(endpoint: string, data?: T): Promise<AxiosResponse<T>> {
     this.checkInitialization();
-    return this.instance!.post<T>(endpoint, data);
+    return this.instance.post<T>(endpoint, data);
   }
 
-  public static async put<T>(endpoint: string, data: Partial<T>): Promise<AxiosResponse<T>> {
+  public async put<T>(
+    endpoint: string,
+    data: Partial<T>
+  ): Promise<AxiosResponse<T>> {
     this.checkInitialization();
-    return this.instance!.put<T>(endpoint, data);
+    return this.instance.put<T>(endpoint, data);
   }
 
-  public static async patch<T>(endpoint: string, data: Partial<T>): Promise<AxiosResponse<T>> {
+  public async patch<T>(
+    endpoint: string,
+    data: Partial<T>
+  ): Promise<AxiosResponse<T>> {
     this.checkInitialization();
-    return this.instance!.patch<T>(endpoint, data);
+    return this.instance.patch<T>(endpoint, data);
   }
 
-  public static async delete<T>(endpoint: string): Promise<AxiosResponse<T>> {
+  public async delete<T>(endpoint: string): Promise<AxiosResponse<T>> {
     this.checkInitialization();
-    return this.instance!.delete<T>(endpoint);
+    return this.instance.delete<T>(endpoint);
   }
 }
