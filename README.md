@@ -1,6 +1,6 @@
 # supaapps-api-kit-client
 
-A versatile, type-safe API client designed for TypeScript applications. It simplifies making HTTP requests and handling responses with built-in support for authorization and automatic handling of unauthorized access scenarios.
+A versatile, type-safe API client designed for TypeScript applications. It simplifies making HTTP requests and handling responses with built-in support for authorization and automatic handling of unauthorized access scenarios, integrates with `supaapps-auth` to handle <b>Automatic Token Refresh</b> and <b>Callbacks</b> when auth fails.
 
 ## Features
 
@@ -42,9 +42,30 @@ const useAuth: boolean = // Optional: default is false, use true if you want to 
 // in case of using auth
 ApiKitClient.initialize(BASE_URL, authTokenCallback, unauthorizationCallback, true);
 
+
 // in case of not using auth
 ApiKitClient.initialize(BASE_URL);
+
 ```
+
+You can initialize multiple ApiClient instances with different configurations if needed.
+here is ways to initialize multiple instances
+
+```ts
+
+import {ApiKitClient} from "./ApiKitClient";
+
+const apiClient1 = (new ApiKitClient()).initialize(BASE_URL); // this initialize apiClient with key 'default'
+const apiClient2 = (new ApiKitClient('default')).initialize(BASE_URL); // this initialize apiClient with 'default' as well
+const apiClient3 = (new ApiKitClient('public')).initialize(BASE_URL); // this initialize apiClient with 'public'
+
+// set key with method
+const apiClient4 = ApiKitClient.i('public').initialize(BASE_URL); // this initialize apiClient with 'public' key
+
+const apiClient5 = ApiKitClient.i('billing').initialize(BASE_URL, authTokenCallback, unauthorizationCallback, true); // this initialize apiClient with 'billing' key
+
+```
+
 
 ## Making Requests
 
