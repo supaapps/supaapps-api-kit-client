@@ -20,7 +20,7 @@ export class ApiKitClient {
     return new ApiKitClient(configInstance);
   }
 
-    private constructor(apiClientKey: string = 'default') {
+    public constructor(apiClientKey: string = 'default') {
         this.apiClientKey = apiClientKey;
     }
 
