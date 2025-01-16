@@ -1,4 +1,4 @@
-import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 import { PaginatedResponse } from './types';
 
 type UnAuthorizedCallback = () => void;
@@ -92,10 +92,14 @@ export class ApiKitClient {
     return axiosInstance!.get<PaginatedResponse<T>>(endpoint, { params });
   }
 
-  public async post<T>(endpoint: string, data?: T): Promise<AxiosResponse<T>> {
+  public async post<T>(
+      endpoint: string,
+      data?: T,
+      options?: Omit<AxiosRequestConfig, 'url' | 'method'> // Exclude 'url' and 'method' since they are handled separately
+  ): Promise<AxiosResponse<T>> {
     this.checkInitialization();
     const axiosInstance = ApiKitClient.apiClients[this.apiClientKey].axiosInstance;
-    return axiosInstance!.post<T>(endpoint, data);
+    return axiosInstance!.post<T>(endpoint, data, options);
   }
 
   public async put<T>(endpoint: string, data: Partial<T>): Promise<AxiosResponse<T>> {
@@ -135,8 +139,12 @@ export class ApiKitClient {
     return (new ApiKitClient('default')).getPaginated<T>(endpoint, params);
   }
 
-  public static async post<T>(endpoint: string, data?: T): Promise<AxiosResponse<T>> {
-    return (new ApiKitClient('default')).post<T>(endpoint, data);
+  public static async post<T>(
+      endpoint: string,
+      data?: T,
+      options?: Omit<AxiosRequestConfig, 'url' | 'method'> // Exclude 'url' and 'method' since they are handled separately
+  ): Promise<AxiosResponse<T>> {
+    return (new ApiKitClient('default')).post<T>(endpoint, data, options);
   }
 
   public static async put<T>(endpoint: string, data: Partial<T>): Promise<AxiosResponse<T>> {
