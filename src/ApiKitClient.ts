@@ -102,16 +102,24 @@ export class ApiKitClient {
     return axiosInstance!.post<T>(endpoint, data, options);
   }
 
-  public async put<T>(endpoint: string, data: Partial<T>): Promise<AxiosResponse<T>> {
+  public async put<T>(
+      endpoint: string,
+      data: Partial<T>,
+      options?: Omit<AxiosRequestConfig, 'url' | 'method'> // Exclude 'url' and 'method' since they are handled separately
+  ): Promise<AxiosResponse<T>> {
     this.checkInitialization();
     const axiosInstance = ApiKitClient.apiClients[this.apiClientKey].axiosInstance;
-    return axiosInstance!.put<T>(endpoint, data);
+    return axiosInstance!.put<T>(endpoint, data, options);
   }
 
-  public async patch<T>(endpoint: string, data: Partial<T>): Promise<AxiosResponse<T>> {
+  public async patch<T>(
+      endpoint: string,
+      data: Partial<T>,
+      options?: Omit<AxiosRequestConfig, 'url' | 'method'> // Exclude 'url' and 'method' since they are handled separately
+  ): Promise<AxiosResponse<T>> {
     this.checkInitialization();
     const axiosInstance = ApiKitClient.apiClients[this.apiClientKey].axiosInstance;
-    return axiosInstance!.patch<T>(endpoint, data);
+    return axiosInstance!.patch<T>(endpoint, data, options);
   }
 
   public async delete<T>(endpoint: string): Promise<AxiosResponse<T>> {
@@ -147,12 +155,20 @@ export class ApiKitClient {
     return (new ApiKitClient('default')).post<T>(endpoint, data, options);
   }
 
-  public static async put<T>(endpoint: string, data: Partial<T>): Promise<AxiosResponse<T>> {
-    return (new ApiKitClient('default')).put<T>(endpoint, data);
+  public static async put<T>(
+      endpoint: string,
+      data: Partial<T>,
+      options?: Omit<AxiosRequestConfig, 'url' | 'method'> // Exclude 'url' and 'method' since they are handled separately
+  ): Promise<AxiosResponse<T>> {
+    return (new ApiKitClient('default')).put<T>(endpoint, data, options);
   }
 
-  public static async patch<T>(endpoint: string, data: Partial<T>): Promise<AxiosResponse<T>> {
-    return (new ApiKitClient('default')).patch<T>(endpoint, data);
+  public static async patch<T>(
+      endpoint: string,
+      data: Partial<T>,
+      options?: Omit<AxiosRequestConfig, 'url' | 'method'> // Exclude 'url' and 'method' since they are handled separately
+  ): Promise<AxiosResponse<T>> {
+    return (new ApiKitClient('default')).patch<T>(endpoint, data, options);
   }
 
   public static async delete<T>(endpoint: string): Promise<AxiosResponse<T>> {
