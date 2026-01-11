@@ -48,12 +48,36 @@ export class ApiKitClient {
     apiClient.axiosInstance.interceptors.request.use(async (config) => {
       if (apiClient.useAuth && apiClient.authTokenCallback) {
         const authToken = await apiClient.authTokenCallback();
+        config.headers = config.headers ?? {};
         config.headers.Authorization = `Bearer ${authToken}`;
       }
       return config;
     });
 
-    apiClient.axiosInstance.interceptors.response.use((response: AxiosResponse) => response, (error: AxiosError) => {
+    apiClient.axiosInstance.interceptors.response.use((response: AxiosResponse) => response, async (error: AxiosError) => {
+      const originalRequest = error.config;
+      const shouldRetry =
+        error.response?.status === 401 &&
+        apiClient.useAuth &&
+        apiClient.authTokenCallback &&
+        originalRequest &&
+        !(originalRequest as { _retry?: boolean })._retry;
+
+      if (shouldRetry) {
+        (originalRequest as { _retry?: boolean })._retry = true;
+        try {
+          const authToken = await apiClient.authTokenCallback();
+          originalRequest.headers = originalRequest.headers ?? {};
+          originalRequest.headers.Authorization = `Bearer ${authToken}`;
+          return apiClient.axiosInstance.request(originalRequest);
+        } catch (refreshError) {
+          if (apiClient.unauthorizedCallback) {
+            apiClient.unauthorizedCallback();
+          }
+          return Promise.reject(refreshError);
+        }
+      }
+
       if (error.response?.status === 401 && apiClient.unauthorizedCallback) {
         apiClient.unauthorizedCallback();
       }
