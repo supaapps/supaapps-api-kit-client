@@ -1,4 +1,10 @@
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
+import axios, {
+  AxiosError,
+  AxiosHeaders,
+  AxiosInstance,
+  AxiosRequestConfig,
+  AxiosResponse,
+} from 'axios';
 import { PaginatedResponse } from './types';
 
 type UnAuthorizedCallback = () => void;
@@ -48,8 +54,9 @@ export class ApiKitClient {
     apiClient.axiosInstance.interceptors.request.use(async (config) => {
       if (apiClient.useAuth && apiClient.authTokenCallback) {
         const authToken = await apiClient.authTokenCallback();
-        config.headers = config.headers ?? {};
-        config.headers.Authorization = `Bearer ${authToken}`;
+        const headers = AxiosHeaders.from(config.headers);
+        headers.set('Authorization', `Bearer ${authToken}`);
+        config.headers = headers;
       }
       return config;
     });
@@ -67,8 +74,9 @@ export class ApiKitClient {
         (originalRequest as { _retry?: boolean })._retry = true;
         try {
           const authToken = await apiClient.authTokenCallback();
-          originalRequest.headers = originalRequest.headers ?? {};
-          originalRequest.headers.Authorization = `Bearer ${authToken}`;
+          const headers = AxiosHeaders.from(originalRequest.headers);
+          headers.set('Authorization', `Bearer ${authToken}`);
+          originalRequest.headers = headers;
           return apiClient.axiosInstance.request(originalRequest);
         } catch (refreshError) {
           if (apiClient.unauthorizedCallback) {
